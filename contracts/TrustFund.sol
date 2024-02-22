@@ -24,6 +24,12 @@ contract TrustFund {
         vault.addToBalance{value: msg.value}();
     }
 
-
+    function withdrawFromVault(uint256 _index) external {
+        if(indexToVaultAddress[_index] == address(0)){
+            revert ();
+        }
+        Vault vault = vaults[_index];
+        vault.withdraw();
+    }
 
 }
