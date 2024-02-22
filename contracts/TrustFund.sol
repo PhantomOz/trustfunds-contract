@@ -4,17 +4,26 @@ import "./Vault.sol";
 
 
 contract TrustFund {
-    mapping(address => mapping(address => address)) public donorToVault;
-    mapping(address => address) public beneficiaryToVault;
+    mapping(uint256 => address) public indexToVaultAddress;
+    Vault[] private vaults;
 
     
 
     function createVault(address _beneficiary, uint256 _unlockTime) external payable{
-        if(donorToVault[msg.sender][_beneficiary] != address(0)){
+        uint256 _index = vaults.length;
+        Vault _vault = new Vault{value: msg.value}(_unlockTime, _beneficiary, msg.sender);
+        indexToVaultAddress[_index] = address(_vault);
+        vaults.push(_vault);
+    }
+
+    function addToVault(uint256 _index) external payable {
+        if(indexToVaultAddress[_index] == address(0)){
             revert ();
         }
-        Vault vault = new Vault{value: msg.value}(_unlockTime, _beneficiary, msg.sender);
-        donorToVault[msg.sender][_beneficiary] = address(vault);
-        beneficiaryToVault[_beneficiary] = address(vault);
+        Vault vault = vaults[_index];
+        vault.addToBalance{value: msg.value}();
     }
+
+
+
 }
