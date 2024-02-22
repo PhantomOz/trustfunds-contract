@@ -32,4 +32,12 @@ contract TrustFund {
         vault.withdraw();
     }
 
+    function getVaultDetails(uint256 _index) external view returns(uint256, uint256, address, address){
+        if(indexToVaultAddress[_index] == address(0)){
+            revert ();
+        }
+        Vault vault = vaults[_index];
+        return vault.getDetails();
+    }
+
 }
