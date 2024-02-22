@@ -54,4 +54,8 @@ contract Vault{
         require(s);
     }
 
+    function getDetails() external view returns(uint256, uint256, address, address){
+        return (balance, unlockTime, beneficiary, creator);
+    }
+
 }
