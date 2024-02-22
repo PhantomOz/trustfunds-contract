@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 import "./Vault.sol";
 
+error NO_VAULT();
 
 contract TrustFund {
     mapping(uint256 => address) public indexToVaultAddress;
@@ -18,7 +19,7 @@ contract TrustFund {
 
     function addToVault(uint256 _index) external payable {
         if(indexToVaultAddress[_index] == address(0)){
-            revert ();
+            revert NO_VAULT();
         }
         Vault vault = vaults[_index];
         vault.addToBalance{value: msg.value}();
@@ -26,7 +27,7 @@ contract TrustFund {
 
     function withdrawFromVault(uint256 _index) external {
         if(indexToVaultAddress[_index] == address(0)){
-            revert ();
+            revert NO_VAULT();
         }
         Vault vault = vaults[_index];
         vault.withdraw();
@@ -34,7 +35,7 @@ contract TrustFund {
 
     function getVaultDetails(uint256 _index) external view returns(uint256, uint256, address, address){
         if(indexToVaultAddress[_index] == address(0)){
-            revert ();
+            revert NO_VAULT();
         }
         Vault vault = vaults[_index];
         return vault.getDetails();
