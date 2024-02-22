@@ -1,21 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
+import "./Vault.sol";
+
 
 contract TrustFund {
-    mapping(address => mapping(address => Vault)) public donorToVault;
-    mapping(address => Vault) public beneficiaryTobalance;
+    mapping(address => mapping(address => address)) public donorToVault;
+    mapping(address => address) public beneficiaryToVault;
 
-    struct Vault {
-        uint256 _amount;
-        uint256 _unlock;
-        bool isCreated;
-    }
+    
 
     function createVault(address _beneficiary, uint256 _unlockTime) external payable{
-        
-        if(donorToVault[msg.sender][_beneficiary].isCreated){
+        if(donorToVault[msg.sender][_beneficiary] != address(0)){
             revert ();
         }
-
+        Vault vault = new Vault{value: msg.value}(_unlockTime, _beneficiary, msg.sender);
+        donorToVault[msg.sender][_beneficiary] = address(vault);
+        beneficiaryToVault[_beneficiary] = address(vault);
     }
 }

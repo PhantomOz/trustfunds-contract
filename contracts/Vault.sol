@@ -14,7 +14,7 @@ contract Vault{
     address private beneficiary;
     address private creator;
 
-    constructor(uint256 _amount, uint256 _unlockTime, address _beneficiary, address _creator) payable{
+    constructor(uint256 _unlockTime, address _beneficiary, address _creator) payable{
         if(_unlockTime < block.timestamp){
             revert MUST_UNLOCK_IN_THE_FUTURE();
         }
@@ -27,7 +27,7 @@ contract Vault{
         if(msg.value <= 0){
             revert AMOUNT_CANT_BE_ZERO();
         }
-        balance += _amount;
+        balance += msg.value;
         unlockTime = _unlockTime;
         beneficiary = _beneficiary;
         creator =_creator;
