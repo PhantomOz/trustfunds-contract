@@ -26,4 +26,25 @@ contract Vault{
         creator =_creator;
     }
 
+    function addToBalance() external payable {
+        if(msg.value <= 0){
+            revert();
+        }
+        if(unlockTime < block.timestamp){
+            revert();
+        }
+        balance += msg.value;
+    }
+
+    function withdraw() external {
+        if(unlockTime > block.timestamp){
+            revert();
+        }
+        if(tx.origin != beneficiary && tx.origin != creator ){
+            revert();
+        }
+        (bool s,) = payable(tx.origin).call{value: balance}("");
+        require(s);
+    }
+
 }
