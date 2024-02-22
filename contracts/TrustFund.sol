@@ -12,15 +12,7 @@ contract TrustFund {
     }
 
     function createVault(address _beneficiary, uint256 _unlockTime) external payable{
-        if(_unlockTime < block.timestamp){
-            revert();
-        }
-        if(_beneficiary == address(0)){
-            revert ();
-        }
-        if(msg.value <= 0){
-            revert();
-        }
+        
         if(donorToVault[msg.sender][_beneficiary].isCreated){
             revert ();
         }
