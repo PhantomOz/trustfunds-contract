@@ -52,5 +52,21 @@ describe("TrustFund", function () {
         await time.increaseTo(unlockTime);
         await expect(trustFund.withdrawFromVault(0)).to.changeEtherBalance(owner, +lockedAmount);
     });
-  })
+  });
+  describe("getVaultDetails", function() {
+    it("Should fail when we getVaultDetails", async function () {
+        const {trustFund, unlockTime, lockedAmount, otherAccount, owner} = await loadFixture(deployTrustFund);
+        await trustFund.createVault(otherAccount, unlockTime, {value: lockedAmount});
+        await expect(trustFund.getVaultDetails(1)).to.be.revertedWithCustomError(trustFund, "NO_VAULT");
+    });
+    it("Should withdraw from vault", async function () {
+        const {trustFund, unlockTime, lockedAmount, otherAccount, owner} = await loadFixture(deployTrustFund);
+        await trustFund.createVault(otherAccount, unlockTime, {value: lockedAmount});
+        const [la, ut, oa, ow] = await trustFund.getVaultDetails(0);
+        expect(la).to.equals(lockedAmount);
+        expect(ut).to.equals(unlockTime);
+        expect(oa).to.equals(otherAccount);
+        expect(ow).to.equals(owner);
+    });
+  });
 });
