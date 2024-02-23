@@ -77,6 +77,7 @@ describe("Vault", function () {
       expect(ow).to.equals(owner);
     });
   });
+  
   describe("Add to balance", function () {
     it("Should receive and addFunds", async function () {
       const { vault, lockedAmount } = await loadFixture(
@@ -99,6 +100,29 @@ describe("Vault", function () {
       );
       await time.increaseTo(unlockTime);
       await expect(vault.addToBalance({value: 1})).to.be.revertedWithCustomError(vault, "VAULT_ALREADY_UNLOCK");
+    });
+  });
+
+  describe("Withdraw", function () {
+    it("Should fail if unlock time has not reached", async function () {
+      const { vault } = await loadFixture(
+        deployOneYearLockFixture
+      );
+      await expect(vault.withdraw()).to.be.revertedWithCustomError(vault, "VAULT_STILL_LOCK");
+    });
+    it("Should fail if it is not the creator of beneficiary that called it", async function () {
+      const { vault, thirdAccount, unlockTime } = await loadFixture(
+        deployOneYearLockFixture
+      );
+      await time.increaseTo(unlockTime);
+      await expect(vault.connect(thirdAccount).withdraw()).to.be.revertedWithCustomError(vault, "NOT_A_BENEFACTOR");
+    });
+    it("Should Emit the withdrawal event", async function () {
+      const { vault, unlockTime, otherAccount, lockedAmount} = await loadFixture(
+        deployOneYearLockFixture
+      );
+      await time.increaseTo(unlockTime);
+      await expect(vault.connect(otherAccount).withdraw()).to.emit(vault, "Withdrawal").withArgs(vault.target, otherAccount, lockedAmount);
     });
   });
 });
