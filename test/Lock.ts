@@ -77,4 +77,28 @@ describe("Vault", function () {
       expect(ow).to.equals(owner);
     });
   });
+  describe("Add to balance", function () {
+    it("Should receive and addFunds", async function () {
+      const { vault, lockedAmount } = await loadFixture(
+        deployOneYearLockFixture
+      );
+      await vault.addToBalance({value: lockedAmount});
+      expect(await ethers.provider.getBalance(vault.target)).to.equal(
+        lockedAmount+lockedAmount
+      );
+    });
+     it("Should fail if value is 0", async function () {
+      const { vault} = await loadFixture(
+        deployOneYearLockFixture
+      );
+      await expect(vault.addToBalance({value: 0})).to.be.revertedWithCustomError(vault, "AMOUNT_CANT_BE_ZERO");
+    });
+    it("Should fail if unlock time has already being reached", async function () {
+      const { vault, unlockTime} = await loadFixture(
+        deployOneYearLockFixture
+      );
+      await time.increaseTo(unlockTime);
+      await expect(vault.addToBalance({value: 1})).to.be.revertedWithCustomError(vault, "VAULT_ALREADY_UNLOCK");
+    });
+  });
 });
