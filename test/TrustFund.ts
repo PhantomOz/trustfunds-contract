@@ -28,4 +28,16 @@ describe("TrustFund", function () {
         await expect(await trustFund.createVault(otherAccount, unlockTime, {value: lockedAmount})).to.emit(trustFund, "CreateVault").withArgs(owner, otherAccount, anyValue);
     })
   })
+  describe("addToVault", function() {
+    it("Should fail when we add to vault", async function () {
+        const {trustFund, unlockTime, lockedAmount, otherAccount, owner} = await loadFixture(deployTrustFund);
+        await trustFund.createVault(otherAccount, unlockTime, {value: lockedAmount});
+        await expect(trustFund.addToVault(1)).to.be.revertedWithCustomError(trustFund, "NO_VAULT");
+    });
+    it("Should add to vault", async function () {
+        const {trustFund, unlockTime, lockedAmount, otherAccount, owner} = await loadFixture(deployTrustFund);
+        await trustFund.createVault(otherAccount, unlockTime, {value: lockedAmount});
+        await expect(trustFund.addToVault(0, {value: lockedAmount})).to.emit(trustFund, "Deposit").withArgs(owner, anyValue, lockedAmount);
+    });
+  })
 });
