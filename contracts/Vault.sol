@@ -53,8 +53,9 @@ contract Vault{
             revert NOT_A_BENEFACTOR();
         }
         (bool s,) = payable(tx.origin).call{value: balance}("");
-        require(s);
-        emit Withdrawal(address(this), msg.sender, balance);
+        if(s){
+            emit Withdrawal(address(this), tx.origin, balance);
+        }
     }
 
     function getDetails() external view returns(uint256, uint256, address, address){
