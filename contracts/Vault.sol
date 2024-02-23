@@ -14,6 +14,8 @@ contract Vault{
     address private beneficiary;
     address private creator;
 
+    event Withdrawal(address indexed _from, address indexed _to, uint256 _value);
+
     constructor(uint256 _unlockTime, address _beneficiary, address _creator) payable{
         if(_unlockTime < block.timestamp){
             revert MUST_UNLOCK_IN_THE_FUTURE();
@@ -52,6 +54,7 @@ contract Vault{
         }
         (bool s,) = payable(tx.origin).call{value: balance}("");
         require(s);
+        emit Withdrawal(address(this), msg.sender, balance);
     }
 
     function getDetails() external view returns(uint256, uint256, address, address){

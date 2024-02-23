@@ -8,13 +8,15 @@ contract TrustFund {
     mapping(uint256 => address) public indexToVaultAddress;
     Vault[] private vaults;
 
-    
+    event Deposit(address indexed _from, address indexed _to, uint256 _value);
+    event CreateVault(address indexed _creator, address indexed _beneficiary, address _vault);
 
     function createVault(address _beneficiary, uint256 _unlockTime) external payable{
         uint256 _index = vaults.length;
         Vault _vault = new Vault{value: msg.value}(_unlockTime, _beneficiary, msg.sender);
         indexToVaultAddress[_index] = address(_vault);
         vaults.push(_vault);
+        emit CreateVault(msg.sender, _beneficiary, address(_vault));
     }
 
     function addToVault(uint256 _index) external payable {
@@ -23,6 +25,7 @@ contract TrustFund {
         }
         Vault vault = vaults[_index];
         vault.addToBalance{value: msg.value}();
+        emit Deposit(msg.sender, address(vault), msg.value);
     }
 
     function withdrawFromVault(uint256 _index) external {
