@@ -39,5 +39,18 @@ describe("TrustFund", function () {
         await trustFund.createVault(otherAccount, unlockTime, {value: lockedAmount});
         await expect(trustFund.addToVault(0, {value: lockedAmount})).to.emit(trustFund, "Deposit").withArgs(owner, anyValue, lockedAmount);
     });
+  });
+  describe("Withdraw", function() {
+    it("Should fail when we withdraw", async function () {
+        const {trustFund, unlockTime, lockedAmount, otherAccount, owner} = await loadFixture(deployTrustFund);
+        await trustFund.createVault(otherAccount, unlockTime, {value: lockedAmount});
+        await expect(trustFund.withdrawFromVault(1)).to.be.revertedWithCustomError(trustFund, "NO_VAULT");
+    });
+    it("Should withdraw from vault", async function () {
+        const {trustFund, unlockTime, lockedAmount, otherAccount, owner} = await loadFixture(deployTrustFund);
+        await trustFund.createVault(otherAccount, unlockTime, {value: lockedAmount});
+        await time.increaseTo(unlockTime);
+        await expect(trustFund.withdrawFromVault(0)).to.changeEtherBalance(owner, +lockedAmount);
+    });
   })
 });
